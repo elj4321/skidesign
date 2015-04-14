@@ -22,12 +22,9 @@ import java.io.PrintStream;
 
 public class skidesign {
 
-  private static boolean debug = true;
+  private static boolean debug = false;
   private static final String task = "skidesign";
   private static PrintStream outs = System.out;
-  static List<Integer> hills = new ArrayList<Integer>();
-
-  private static final MAX_DIFF = 17;
 
   /**
    * @param args
@@ -43,6 +40,9 @@ public class skidesign {
     // Up to 1<=N<=1000 hills followed by hill heights
     // Hill heights 0<=H<=100
 
+    int MAX_DIFF = 17;
+
+    List<Integer> hills = new ArrayList<Integer>();
     // Read in number of hill heights
     int numHills = scanr.nextInt();
     outd("Num hills: " + numHills);
@@ -60,11 +60,17 @@ public class skidesign {
     outd("Min hill:" + minH);
     outd("Max hill:" + maxH);
 
-    long minCost = 0L;
 
-    // Brute force this by examing every possible solution from the lowest hill
+    // Brute force this by examining every possible solution from the lowest hill
     //   to the tallest hill - MAX_DIFF
-//    checkR(whpList, whFullList);
+    int startH = minH;
+    int stopH = maxH - MAX_DIFF;
+    long minCost = Integer.MAX_VALUE;
+    for (int h = startH; h <= stopH; h++)
+    {
+      long totCost = computeTotalCost(h, h + MAX_DIFF, hills);
+      if (totCost < minCost) minCost = totCost;
+    }
     outd("minCost: " + minCost);
     out.println(minCost);
     scanr.close();
@@ -72,10 +78,27 @@ public class skidesign {
     System.exit(0);
   }
 
+  static long computeTotalCost(int minHH, int maxHH, List<Integer> allHills)
+  {
+    long totCost = 0;
+    outd("Compute: " + minHH + ":" + maxHH);
+    for (Integer hh : allHills)
+    {
+      if (hh < minHH)
+      {
+        totCost += (minHH-hh)*(minHH-hh);
+      }
+      else if (hh > maxHH)
+      {
+        totCost += (hh-maxHH)*(hh-maxHH);
+      }
+    }
+    outd("totCost: " + totCost);
+    return totCost;
+  }
 
   static void outd(String msg)
   {
     if (debug) outs.println(msg);
   }
-
 }
